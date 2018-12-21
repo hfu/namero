@@ -342,15 +342,6 @@ module.exports = (f) => {
       break
 
     // symbol
-    case '7201':
-    case '7202':
-    case '7211':
-    case '7212':
-    case '7288':
-    case '7299':
-    case '7221':
-    case '7701':
-    case '7711':
     case '3200':
     case '3201':
     case '3202':
@@ -417,6 +408,15 @@ module.exports = (f) => {
     case '7122':
     case '7131':
     case '7188':
+    case '7201':
+    case '7202':
+    case '7211':
+    case '7212':
+    case '7288':
+    case '7299':
+    case '7221':
+    case '7701':
+    case '7711':
     case '8103': // 発電所等
     case '8105': // 電波塔
     case '8301': // 樹木に囲まれた居住地
