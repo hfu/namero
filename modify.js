@@ -129,6 +129,11 @@ module.exports = (f) => {
     case '7601':
     case '7621':
       f.tippecanoe.layer = 'landform'
+      if (f.properties._src === '200000') {
+        if (f.geometry.type === 'LineString') {
+          f.tippecanoe.minzoom = 11
+        }
+      }
       break
 
     // cotour
