@@ -281,6 +281,7 @@ module.exports = (f) => {
           case '市区町村道等':
           case 'その他':
           case '不明':
+          default: 
             f.tippecanoe.minzooom = 12
             break
         }
@@ -322,6 +323,16 @@ module.exports = (f) => {
     case '2899':
     case '8201': // 鉄道中心線
       f.tippecanoe.layer = 'railway'
+      if (f.properties._src === '200000') {
+        switch (f.properties.snglDbl) {
+          case '複線以上':
+            f.tippecanoe.minzoom = 10
+            break
+          default:
+            f.tippecanoe.minzoom = 11
+            break
+        }
+      }
       break
 
     // transport
