@@ -151,7 +151,7 @@ module.exports = (f) => {
     case '3188': // その他
     case '3199': // 不明
       f.tippecanoe.layer = 'building'
-      if (ftCode === '3177') {
+      if (f.properties.ftCode === '3177') {
         f.tippecanoe.minzoom = 12
         f.tippecanoe.maxzoom = 14
       } else {
