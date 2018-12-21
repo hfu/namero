@@ -40,7 +40,6 @@ modularize.rb は内部で mod.js を呼び出します。mod.js は gh:hfu/tent
 ## モジュールごとの ndjson.gz ファイルを Tippecanoe で mbtiles ファイル群に変換する
 ```console
 $ tipp.sh | sh
-$ ruby move.rb | sh
 ```
 tippe.sh は内部で UNIX の find コマンドと、tippecanoe を呼び出します。
 
