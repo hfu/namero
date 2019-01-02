@@ -58,76 +58,65 @@ module.exports = (f) => {
       return null
 
     // water
-    case '5100':
-    case '5101':
-    case '5102':
-    case '5103':
-    case '5111':
-    case '5121':
-    case '5188':
-    case '5199':
-    case '5200':
-    case '5201':
-    case '5202':
-    case '5203':
-    case '5211':
-    case '5212':
-    case '5221':
-    case '5231':
-    case '5232':
-    case '5233':
-    case '5242':
-    case '5251':
-    case '5288':
-    case '5299':
-    case '5301':
-    case '5302':
-    case '5311':
-    case '5312':
-    case '5321':
-    case '5322':
-    case '5331':
-    case '5388':
-    case '5399':
+    // 51: 海岸線, 52: 水涯線, 53: 河川中心線
+    case '5100': // 海の水域
+    case '5101': // 海岸線の通常部
+    case '5102': // 海岸線の岩等に接する部分
+    case '5103': // 海岸線の堤防等に接する部分
+    case '5111': // 海側の河口線
+    case '5121': // 海岸線の露岩
+    case '5188': // その他の海岸線
+    case '5199': // 不明な海岸線
+    case '5200': // 河川と湖池の水域
+    case '5201': // 河川の通常部
+    case '5202': // 河川の岩等に接する部分
+    case '5203': // 河川の堤防等に接する部分
+    case '5211': // 河川側の河口線
+    case '5212': // 河川側の湖池界線
+    case '5221': // 河川の露岩
+    case '5231': // 湖池の通常部
+    case '5232': // 湖池の岩等に接する部分
+    case '5233': // 湖池の堤防等に接する部分
+    case '5242': // 湖池側の湖池界線
+    case '5251': // 湖池の露岩
+    case '5288': // その他の水涯線
+    case '5299': // 不明な水涯線
+    case '5301': // 一条河川の通常部
+    case '5302': // 一条河川の枯れ川部
+    case '5311': // 二条河川中心線の通常部
+    case '5312': // 二条河川中心線の枯れ川部
+    case '5321': // 空間の人工水路
+    case '5322': // 地下の人工水路
+    case '5331': // 用水路
+    case '5388': // その他の河川中心線
+    case '5399': // 不明な河川中心線
     case '5911': // 流水方向
       f.tippecanoe.layer = 'water'
-      if (f.properties._src === '200000') {
-        switch (f.properties.ftCode) {
-          case '5201':
-          case '5202':
-          case '5203':
-            f.tippecanoe.minzoom = 10
-            break
-          default:
-            f.tippecanoe.minzoom = 12
-            break
-        }
-      }
       break
 
     // landform
-    case '5521': // 滝
-    case '5801': // 滝領域
-    case '7401':
-    case '7402':
-    case '7403':
-    case '7501':
-    case '7502':
-    case '7509':
-    case '7511':
-    case '7512':
+    case '5521': // 滝の水部構造物線
+    case '5801': // 滝の領域
+    case '7401': // 湿地の地形表記面
+    case '7402': // 万年雪の地形表記面
+    case '7403': // 領域が明瞭な砂礫地の地形表記面
+    case '7501': // コンクリートな土崖
+    case '7502': // コンクリートでない土崖
+    case '7509': // 不明な土崖
+    case '7511': // 岩崖
+    case '7512': // 岩
     case '7513': // 段丘崖
-    case '7521':
-    case '7531':
-    case '7532':
-    case '7533':
-    case '7541':
-    case '7551':
-    case '7561':
-    case '7571':
-    case '7572':
-    case '7601':
-    case '7621':
+    case '7521': // 雨裂の上部
+    case '7531': // 大凹地の方向線
+    case '7532': // 小凹地の方向線
+    case '7533': // <20>凹地の方向線
+    case '7541': // 隠顕岩
+    case '7551': // 干潟界
+    case '7561': // 枯れ川水涯線
+    case '7571': // 湖底急斜面
+    case '7572': // 水部の凹地の方向線
+    case '7601': // 領域が不明瞭な砂礫地の地形記号
+    case '7621': // 雨裂の下部
       f.tippecanoe.layer = 'landform'
       if (f.properties._src === '200000') {
         if (f.geometry.type === 'LineString') {
@@ -137,12 +126,12 @@ module.exports = (f) => {
       break
 
     // contour
-    case '7351':
-    case '7352':
-    case '7353':
-    case '7371':
-    case '7372':
-    case '7373':
+    case '7351': // ふつうの等高線
+    case '7352': // 等高線に数値が入るところ
+    case '7353': // 等高線が崖に重なるところ
+    case '7371': // ふつうの等深線
+    case '7372': // 等深線に数値が入るところ
+    case '7373': // 等深線が崖に重なるところ
       f.tippecanoe.layer = 'contour'
       break
 
@@ -159,120 +148,120 @@ module.exports = (f) => {
       if (f.properties.ftCode === '3177') {
         f.tippecanoe.minzoom = 12
         f.tippecanoe.maxzoom = 14
+        let area = geojsonArea.geometry(f.geometry)
+        if (area < 1000) {
+          f.tippecanoe.minzoom = 15
+        } else if (area > 5000) {
+          f.tippecanoe.minzoom = 11
+        }
       } else {
         f.tippecanoe.minzoom = 15
-      }
-      let area = geojsonArea.geometry(f.geometry)
-      if (area < 100) {
-        f.tippecanoe.minzoom = 14
-      } else if (area < 1000) {
-        f.tippecanoe.minzoom = 13
-      } else if (area > 5000) { // 面積が約 5000 m^2 以上の地物は z=11 から採用する
-        f.tippecanoe.minzoom = 11
       }
       break
 
     // structure
-    case '4201':
-    case '4202':
-    case '4301': // 巨大構造物
-    case '4302': // タンク
-    case '5401':
-    case '5501': // ダム
-    case '5514':
-    case '5515':
-    case '5532':
-    case '5551':
+    case '4201': // 高塔の線
+    case '4202': // 坑口の線
+    case '4301': // 巨大構造物の面
+    case '4302': // タンクの面
+    case '5501': // ダムの線
+    case '5514': // せきの線
+    case '5515': // 水門の線
+    case '5532': // 透過水制の線
+    case '5551': // 河川トンネル口の線
     case '8202': // 送電線
-    case '8206': // 大水制
+    case '8206': // 大きな水制
       f.tippecanoe.layer = 'structure'
       break
- 
+
     // route
-    case '5901':
-    case '5902':
+    case '5901': // 船舶の表記線
+    case '5902': // 航路の表記線
       f.tippecanoe.layer = 'route'
       break
 
     // boundary
-    case '1103':
-    case '1104':
-    case '1201':
-    case '1202':
-    case '1203':
-    case '1204':
-    case '1208':
-    case '1209':
-    case '1211':
-    case '1212':
-    case '1218':
-    case '1219':
-    case '1221':
-    case '1222':
-    case '1288':
-    case '1299':
-    case '1301':
-    case '1302':
-    case '1303':
-    case '1304':
-    case '1388':
-    case '1399':
-    case '1601':
-    case '1688':
-    case '1699':
-    case '1701':
-    case '1801':
+    case '1103': // 郡と市と東京都の区の区画
+    case '1104': // 町と村と指定都市の区の区画
+    case '1201': // 都道府県の境界
+    case '1202': // 総合振興局や振興局の境界
+    case '1203': // 郡や市や東京都の区の境界
+    case '1204': // 町や村や指定都市の区の境界
+    case '1208': // 未定の境界
+    case '1209': // 不明の境界
+    case '1211': // 25000の都道府県や総合振興局や振興局の境界
+    case '1212': // 25000の市区町村の境界
+    case '1218': // 25000の未定の境界
+    case '1219': // 25000の不明の境界
+    case '1221': // 25000で所属を明示する境界線
+    case '1222': // 25000で所属を包括する非表示線
+    case '1288': // その他の境界
+    case '1299': // 不明な境界
+    case '1301': // 都道府県の代表点
+    case '1302': // 総合振興局や振興局の代表点
+    case '1303': // 郡や市や東京都の区の代表点
+    case '1304': // 町や村や指定都市の区の代表点
+    case '1388': // その他の行政区画の代表点
+    case '1399': // 不明な行政区画の代表点
+    case '1601': // 住居表示地域の街区域
+    case '1688': // その他の街区域
+    case '1699': // 不明な街区域
+    case '1701': // 街区線
+    case '1801': // 街区の代表点
     case '6101': // 特定地区界
-    case '6111':
     case '8104': // 植生界点
     case '8205': // 植生界線
       f.tippecanoe.layer = 'boundary'
       break
 
-    // road
-    case '2200':
-    case '2201':
-    case '2202':
-    case '2203':
-    case '2204':
-    case '2221':
-    case '2222':
-    case '2223':
-    case '2224':
-    case '2241':
-    case '2242':
-    case '2243':
-    case '2244':
-    case '2251':
-    case '2271':
-    case '2272':
-    case '2273':
-    case '2274':
-    case '2288':
-    case '2299':
-    case '2401':
-    case '2411':
-    case '2412':
-    case '2501':
+    // road (道路縁)
+    case '2200': // 階層化面閉じ線
+    case '2201': // 通常の道路縁
+    case '2202': // 通常の遮蔽された道路縁
+    case '2203': // 通常の橋や高架の道路縁
+    case '2204': // 通常のトンネル入口線
+    case '2221': // 庭園路の道路縁
+    case '2222': // 庭園路の遮蔽された道路縁
+    case '2223': // 庭園路の橋や高架の道路縁
+    case '2224': // 庭園路のトンネル入口線
+    case '2241': // 中心線由来の道路縁
+    case '2242': // 中心線由来の遮蔽された道路縁
+    case '2243': // 中心線由来の橋や高架の道路縁
+    case '2244': // 中心線由来のトンネル入口線
+    case '2251': // 中心線由来の庭園路の道路縁
+    case '2271': // 軽車道の道路縁
+    case '2272': // 軽車道の隠蔽された道路縁
+    case '2273': // 軽車道の橋や高架の道路縁
+    case '2274': // 軽車道のトンネル入口線
+    case '2288': // その他の道路縁
+    case '2299': // 不明な道路縁
+    case '2401': // トンネル内の道路
+    case '2411': // 分離帯
+    case '2412': // 遮蔽された分離帯
+    case '2501': // 道路区域界線
+      f.tippecanoe.layer = 'road'
       f.tippecanoe.minzoom = 15 // 道路縁・道路構成線・道路区域界線は z=15 で採用
-    case '2701':
-    case '2702':
-    case '2703':
-    case '2704':
-    case '2711':
-    case '2712':
-    case '2713':
-    case '2714':
-    case '2721':
-    case '2722':
-    case '2723':
-    case '2724':
-    case '2731':
-    case '2732':
-    case '2733':
-    case '2734':
-    case '2788':
-    case '2799':
+      break
+
+    // road (道路中心線)
+    case '2701': // ２条道路中心線
+    case '2702': // 雪覆いがされた２条道路中心線
+    case '2703': // 橋や高架の２条道路中心線
+    case '2704': // トンネルの２条道路中心線
+    case '2711': // 庭園路の２条道路中心線
+    case '2712': // 雪覆いがされた庭園路の２条道路中心線
+    case '2713': // 橋や高架の庭園路の２条道路中心線
+    case '2714': // トンネルの庭園路の２条道路中心線
+    case '2721': // 徒歩道
+    case '2722': // 雪覆いがされた徒歩道
+    case '2723': // 橋や高架の徒歩道
+    case '2724': // トンネルの徒歩道
+    case '2731': // 石段
+    case '2732': // 雪覆いがされた石段
+    case '2733': // 橋や高架の石段
+    case '2734': // トンネルの石段
+    case '2788': // その他の道路中心線
+    case '2799': // 不明な道路中心線
       f.tippecanoe.layer = 'road'
       if (f.properties._src === '200000') {
         switch (f.properties.rdCtg) {
@@ -286,7 +275,7 @@ module.exports = (f) => {
           case '市区町村道等':
           case 'その他':
           case '不明':
-          default: 
+          default:
             f.tippecanoe.minzooom = 12
             break
         }
