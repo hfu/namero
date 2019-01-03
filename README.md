@@ -37,13 +37,29 @@ $ ruby modularize.rb | sh
 ```
 modularize.rb は内部で mod.js を呼び出します。mod.js は gh:hfu/tentsuki の index.js の改造版です。
 
-## モジュールごとの ndjson.gz ファイルを Tippecanoe で mbtiles ファイル群に変換する
+## <strike>モジュールごとの ndjson.gz ファイルを Tippecanoe で mbtiles ファイル群に変換する</strike>
+このステップは、下記の remodify.js を使ったステップに更新されました。
+<details>
 ```console
 $ tipp.sh | sh
 ```
 tippe.sh は内部で UNIX の find コマンドと、tippecanoe を呼び出します。
+</details>
+
+## モジュールごとの ndjson.gz ファイルに（再び）modify.js を適用しつつ、3並列程度並列に mbtiles ファイル群に変換する
+modularize.rb を再実行したときに、mod.js を何度も実行することは効率が悪いことに気がついたので、上記 tipp.sh に相当する処理を行う際に（再び）modify.js を適用するように整えたプログラム remodify.js を作成しました。
+
+```console
+$ node remodify.js
+```
+
+remodify.js は内部で tippecanoe を呼び出します。
+
+ベクトルタイルスキーマを修正したいときには、修正対象の .mbtiles ファイルを削除するとともに、modify.js を修正して、再び node remodify.js を実行すればよいことになります。
 
 これでできた mbtiles ファイルを spinel か pietra でホストすれば完了です。
 
+
 # 技術的なメモ
 - mod.js では、「gz 圧縮したデータは cat でつなぐことができる」という特性を使っています。
+- しかし、この「cat でつなぐ」に相当する「a+ で write する」が mod.js の性能上のボトルネックになっている可能性があります。今後、もしも mod.js での処理相当のことを高速化する必要がある場合には、おそらく「ファイル名の末尾にランダムな文字列をつけて、ばらばらのファイルとして作成しておき、次の処理ステップの段階で続けて読む」ような工夫をすれば良いと思います。namero では、tipp.sh / tipp.rb を remodify.js にアップグレードしたことで、刻む処理をなるべく行わずに済ませることをしたので、この工夫はまだ実施する必要がないと考えています。
