@@ -430,6 +430,8 @@ module.exports = (f) => {
 
     // label 
     case '100': // <20>注記
+    case '200': // <20>注記（probably undocumented, but found）
+    case '300': // <20>注記（probably undocumented, but found）
     case '0110':
     case '0120':
     case '0210':
