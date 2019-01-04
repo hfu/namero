@@ -133,6 +133,15 @@ module.exports = (f) => {
     case '7372': // 等深線に数値が入るところ
     case '7373': // 等深線が崖に重なるところ
       f.tippecanoe.layer = 'contour'
+      if (f.properties._src === '25000') {
+        f.tippecanoe.minzoom = 15
+        if (f.properties.alti % 40 === 0) {
+          f.tippecanoe.minzoom = 14
+        }
+        if (f.properties.alti % 80 === 0) {
+          f.tippecanoe.minzoom = 13
+        }
+      }
       break
 
     // building
@@ -212,6 +221,15 @@ module.exports = (f) => {
     case '8104': // 植生界点
     case '8205': // 植生界線
       f.tippecanoe.layer = 'boundary'
+      switch (f.properties.ftCode) {
+        case '1601':
+        case '1688':
+        case '1699':
+        case '1701':
+        case '1801':
+          f.tippecanoe.minzoom = 15
+          break
+      }
       break
 
     // road (道路縁)
@@ -317,15 +335,22 @@ module.exports = (f) => {
     case '2899':
     case '8201': // 鉄道中心線
       f.tippecanoe.layer = 'railway'
-      if (f.properties._src === '200000') {
-        switch (f.properties.snglDbl) {
-          case '複線以上':
-            f.tippecanoe.minzoom = 10
-            break
-          default:
-            f.tippecanoe.minzoom = 11
-            break
-        }
+      switch (f.properties._src) {
+        case '200000':
+          switch (f.properties.snglDbl) {
+            case '複線以上':
+              f.tippecanoe.minzoom = 10
+              break
+            default:
+              f.tippecanoe.minzoom = 11
+              break
+          }
+          f.tippecanoe.maxzoom = 14
+          break
+        case '25000':
+          f.tippecanoe.minzoom = 15
+          f.tippecanoe.maxzoom = 15
+          break
       }
       break
 
