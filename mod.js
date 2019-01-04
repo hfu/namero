@@ -1,7 +1,7 @@
 const config = require('config')
 const fs = require('fs')
 const zlib = require('zlib')
-const readline = require('readline')
+const byline = require('byline')
 const tilebelt = require('@mapbox/tilebelt')
 const bbox = require('@turf/bbox').default
 
@@ -9,29 +9,29 @@ const bbox = require('@turf/bbox').default
 
 const z = config.get('z')
 const streams = {}
+const createPath = (w3n) => {
+  return `${config.get('dst')}/${w3n}.ndjson.gz`
+}
 const streamWrite = (w3n, s) => {
   if (!streams[w3n]) {
     streams[w3n] = zlib.createGzip()
-    streams[w3n].pipe(fs.
-      createWriteStream(`${config.get('dst')}/${w3n}.ndjson.gz`, {flags: 'a'}))
+      .pipe(fs.createWriteStream(createPath(w3n), {flags: 'a'}))
   }
   streams[w3n].write(s)
 }
 let count = 0
 
-const rl = readline.createInterface({
-  input: fs.createReadStream(process.argv[2]).pipe(zlib.createGunzip()),
-  output: process.stdout,
-  terminal: false
-})
+const input = byline(fs.createReadStream(process.argv[2])
+  .pipe(zlib.createGunzip()))
 
-rl.on('line', line => {
+input.on('data', line => {
   if (line.length === 0) return
   let f = JSON.parse(line)
   f.properties._src = process.argv[3]
   const b = bbox(f)
-  const [minx, miny] = tilebelt.pointToTile(b[0], b[1], z)
-  const [maxx, maxy] = tilebelt.pointToTile(b[2], b[3], z)
+  // please not that y increase southwards
+  const [minx, maxy] = tilebelt.pointToTile(b[0], b[1], z)
+  const [maxx, miny] = tilebelt.pointToTile(b[2], b[3], z)
   for (let x = minx; x <= maxx; x++) {
     for (let y = miny; y <= maxy; y++) {
       streamWrite(`${z}-${x}-${y}`, `${JSON.stringify(f)}\n`)
@@ -39,7 +39,7 @@ rl.on('line', line => {
   }
 })
 
-rl.on('close', () => {
+input.on('end', () => {
   for (const w3n in streams) {
     streams[w3n].end()
   }
