@@ -212,6 +212,15 @@ module.exports = (f) => {
     case '8104': // 植生界点
     case '8205': // 植生界線
       f.tippecanoe.layer = 'boundary'
+      switch (f.properties.ftCode) {
+        case '1601':
+        case '1688':
+        case '1699':
+        case '1701':
+        case '1801':
+          f.tippecanoe.minzoom = 15
+          break
+      }
       break
 
     // road (道路縁)
