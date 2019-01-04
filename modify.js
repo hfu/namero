@@ -133,6 +133,15 @@ module.exports = (f) => {
     case '7372': // 等深線に数値が入るところ
     case '7373': // 等深線が崖に重なるところ
       f.tippecanoe.layer = 'contour'
+      if (f.properties._src === '25000') {
+        f.tippecanoe.minzoom = 15
+        if (f.properties.alti % 40 === 0) {
+          f.tippecanoe.minzoom = 14
+        }
+        if (f.properties.alti % 80 === 0) {
+          f.tippecanoe.minzoom = 13
+        }
+      }
       break
 
     // building
