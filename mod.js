@@ -4,7 +4,6 @@ const zlib = require('zlib')
 const readline = require('readline')
 const tilebelt = require('@mapbox/tilebelt')
 const bbox = require('@turf/bbox').default
-const modify = require('./modify.js')
 
 // You may want to 'ulimit -n 65536'
 
@@ -31,8 +30,8 @@ rl.on('line', line => {
   let f = JSON.parse(line)
   f.properties._src = process.argv[3]
   const b = bbox(f)
-  const [minx, miny] = tilebelt.pointToTile(b[0], b[1], z))
-  const [maxx, maxy] = tilebelt.pointToTile(b[2], b[3], z))
+  const [minx, miny] = tilebelt.pointToTile(b[0], b[1], z)
+  const [maxx, maxy] = tilebelt.pointToTile(b[2], b[3], z)
   for (let x = minx; x <= maxx; x++) {
     for (let y = miny; y <= maxy; y++) {
       streamWrite(`${z}-${x}-${y}`, `${JSON.stringify(f)}\n`)
