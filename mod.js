@@ -8,6 +8,7 @@ const modify = require('./modify.js')
 
 // You may want to 'ulimit -n 65536'
 
+const z = config.get('z')
 const streams = {}
 const streamWrite = (w3n, s) => {
   if (!streams[w3n]) {
@@ -30,14 +31,11 @@ rl.on('line', line => {
   let f = JSON.parse(line)
   f.properties._src = process.argv[3]
   const b = bbox(f)
-  const w = [[0, 1], [0, 3], [2, 1], [2, 3]].map(v => {
-    const [x, y, z] = tilebelt.pointToTile(b[v[0]], b[v[1]], config.get('z'))
-    return `${z}-${x}-${y}`
-  }).filter((x, i, self) => self.indexOf(x) === i)
-  f = modify(f)
-  if (f) {
-    for (const w3n of w) {
-      streamWrite(w3n, `${JSON.stringify(f)}\n`)
+  const [minx, miny] = tilebelt.pointToTile(b[0], b[1], z))
+  const [maxx, maxy] = tilebelt.pointToTile(b[2], b[3], z))
+  for (let x = minx; x <= maxx; x++) {
+    for (let y = miny; y <= maxy; y++) {
+      streamWrite(`${z}-${x}-${y}`, `${JSON.stringify(f)}\n`)
     }
   }
 })
