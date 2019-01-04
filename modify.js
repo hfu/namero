@@ -317,15 +317,22 @@ module.exports = (f) => {
     case '2899':
     case '8201': // 鉄道中心線
       f.tippecanoe.layer = 'railway'
-      if (f.properties._src === '200000') {
-        switch (f.properties.snglDbl) {
-          case '複線以上':
-            f.tippecanoe.minzoom = 10
-            break
-          default:
-            f.tippecanoe.minzoom = 11
-            break
-        }
+      switch (f.properties._src) {
+        case '200000':
+          switch (f.properties.snglDbl) {
+            case '複線以上':
+              f.tippecanoe.minzoom = 10
+              break
+            default:
+              f.tippecanoe.minzoom = 11
+              break
+          }
+          f.tippecanoe.maxzoom = 14
+          break
+        case '25000':
+          f.tippecanoe.minzoom = 15
+          f.tippecanoe.maxzoom = 15
+          break
       }
       break
 
