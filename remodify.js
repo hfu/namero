@@ -1,6 +1,5 @@
 const config = require('config')
 const fs = require('fs')
-const zlib = require('zlib')
 const Queue = require('better-queue')
 const tempy = require('tempy')
 const byline = require('byline')
@@ -8,13 +7,15 @@ const { spawn } = require('child_process')
 const TimeFormat = require('hh-mm-ss')
 const modify = require('./modify.js')
 
+const $minAge = config.get('minAge')
+
 var queue= new Queue((src, cb) => {
   const startTime = new Date()
-  if ( startTime - fs.statSync(src).mtime < 60000 ) {
-    console.log(`Skipped ${src} because it is too new.`)
+  if ( startTime - fs.statSync(src).mtime < $minAge ) {
+    console.log(`Skipped ${src} because it is younger than ${$minAge / 1000} seconds.`)
     return cb()
   }
-  const mb = src.replace(config.get('dst'), 'mbtiles').replace('ndjson.gz', 'mbtiles')
+  const mb = src.replace(config.get('dst'), 'mbtiles').replace('ndjson', 'mbtiles')
   if ( fs.existsSync(mb) ) {
     if ( fs.statSync(mb).mtime > fs.statSync(src).mtime ) {
       console.log(`Skipped ${src} because ${mb} is newer.`)
@@ -22,7 +23,7 @@ var queue= new Queue((src, cb) => {
     }
   }
   const tmp = tempy.file()
-  const input = byline(fs.createReadStream(src).pipe(zlib.createGunzip()))
+  const input = byline(fs.createReadStream(src))
   const output = fs.createWriteStream(tmp)
   input.on('data', line => {
     if (line.length === 0) return
@@ -61,7 +62,7 @@ queue.on('task_failed', (taskId, errorMessage) => {
 fs.readdir(config.get('dst'), (err, files) => {
   if (err) throw err
   for (const file of files) {
-    if (file.endsWith('ndjson.gz')) {
+    if (file.endsWith('ndjson')) {
       queue.push(`${config.get('dst')}/${file}`)
     }
   }
