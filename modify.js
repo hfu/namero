@@ -118,10 +118,16 @@ module.exports = (f) => {
     case '7601': // 領域が不明瞭な砂礫地の地形記号
     case '7621': // 雨裂の下部
       f.tippecanoe.layer = 'landform'
-      if (f.properties._src === '200000') {
-        if (f.geometry.type === 'LineString') {
-          f.tippecanoe.minzoom = 11
-        }
+      switch (f.properties._src) {
+        case '200000':
+          f.tippecanoe.maxzoon = 13
+          if (f.geometry.type === 'LineString') {
+            f.tippecanoe.minzoom = 11
+          }
+          break
+        case '25000':
+          f.tippecanoe.minzoom = 14
+          break
       }
       break
 
