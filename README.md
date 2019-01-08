@@ -32,10 +32,18 @@ $ ruby 25000.rb | sh
 ファイルの読み先と文字コードについては、それぞれの rb ファイルにハードコードしているので、適宜変更してください。
 
 ## ndjson.gz ファイルをモジュールで刻み直して ndjson.gz ファイルに格納する
+### 新しい実装
+```console
+$ node modularize.js
+```
+
+### 古い実装（使わない）
+<details>
 ```console
 $ ruby modularize.rb | sh
 ```
 modularize.rb は内部で mod.js を呼び出します。mod.js は gh:hfu/tentsuki の index.js の改造版です。
+</details>
 
 ## モジュールごとの ndjson.gz ファイルに modify.js を適用しつつ、3並列程度並列に mbtiles ファイル群に変換する
 modularize.rb を再実行したときに、mod.js を何度も実行することは効率が悪いことに気がついたので、上記 tipp.sh に相当する処理を行う際に modify.js を適用するように整えたプログラム remodify.js を作成しました。

@@ -2,4 +2,5 @@
   dst: dst
   z: 10
   minAge: 60000
+  nMaxListeners: 1000
 }
