@@ -1,17 +1,19 @@
 const config = require('config')
 const fs = require('fs')
-const zlib = require('zlib')
 const Queue = require('better-queue')
 const tempy = require('tempy')
 const byline = require('byline')
 const { spawn } = require('child_process')
 const TimeFormat = require('hh-mm-ss')
+const zlib = require('zlib')
 const modify = require('./modify.js')
 
-var queue= new Queue((src, cb) => {
+const $minAge = config.get('minAge')
+
+const queue = new Queue((src, cb) => {
   const startTime = new Date()
-  if ( startTime - fs.statSync(src).mtime < 60000 ) {
-    console.log(`Skipped ${src} because it is too new.`)
+  if ( startTime - fs.statSync(src).mtime < $minAge ) {
+    console.log(`Skipped ${src} because it is younger than ${$minAge / 1000} seconds.`)
     return cb()
   }
   const mb = src.replace(config.get('dst'), 'mbtiles').replace('ndjson.gz', 'mbtiles')
@@ -21,11 +23,16 @@ var queue= new Queue((src, cb) => {
       return cb()
     }
   }
-  const tmp = tempy.file()
-  const input = byline(fs.createReadStream(src).pipe(zlib.createGunzip()))
+  const tmp = tempy.file({ extension: 'remodify' })
+  const s = fs.createReadStream(src)
+  const gunzip = zlib.createGunzip()
+  s.pipe(gunzip)
+  const input = byline(gunzip)
   const output = fs.createWriteStream(tmp)
+  let c = 0
   input.on('data', line => {
     if (line.length === 0) return
+    c++
     try {
       let f = JSON.parse(line)
       f = modify(f)
@@ -34,9 +41,9 @@ var queue= new Queue((src, cb) => {
       console.log(`f ${src} ${line}`)
     }
   })
-  input.on('end', () => {
+  const finish = () => {
     output.close()
-    const tippecanoe = spawn('tippecanoe', [
+    const tippecanoe = spawn('tippecanoe',[
       '--quiet', '--no-feature-limit', '--no-tile-size-limit',
       '--minimum-zoom=10', '--maximum-zoom=15', '--base-zoom=15',
       '--read-parallel', '-f', '--simplification=2', '-o',
@@ -46,10 +53,17 @@ var queue= new Queue((src, cb) => {
       fs.unlink(tmp, (err) => {
         if (err) throw err
         const t = TimeFormat.fromMs((new Date()) - startTime)
-        console.log(`${src} -> (${tmp}) -> ${mb}: ${t}`)
+        console.log(`${src} (${c}) -> ${mb}: ${t}`)
         return cb()
       })
     })
+  }
+  input.on('end', () => {
+    finish()
+  })
+  gunzip.on('error', () => {
+    // finish even when the .gz file was not complete.
+    finish()
   })
 }, { concurrent: 3 })
 

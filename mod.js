@@ -10,12 +10,11 @@ const bbox = require('@turf/bbox').default
 const z = config.get('z')
 const streams = {}
 const createPath = (w3n) => {
-  return `${config.get('dst')}/${w3n}.ndjson.gz`
+  return `${config.get('dst')}/${w3n}.ndjson`
 }
 const streamWrite = (w3n, s) => {
   if (!streams[w3n]) {
-    streams[w3n] = zlib.createGzip()
-      .pipe(fs.createWriteStream(createPath(w3n), {flags: 'a'}))
+    streams[w3n] = fs.createWriteStream(createPath(w3n), {flags: 'a'})
   }
   streams[w3n].write(s)
 }

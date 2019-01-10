@@ -1,3 +1,4 @@
+throw "use modularize.js instead of this."
 require 'find'
 print "rm dst/*\n"
 

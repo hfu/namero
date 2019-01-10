@@ -1,7 +1,7 @@
 *.ndjson.gz
 *.mbtiles
 *.mbtiles-journal
-dst2
+dst
 
 # Logs
 logs
