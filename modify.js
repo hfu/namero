@@ -57,10 +57,61 @@ module.exports = (f) => {
     case undefined:
       return null
 
-    // water
+    // (1) nature (formarly known as contour and landform)
+    case '5521': // 滝の水部構造物線
+    case '5801': // 滝の領域
+    case '7351': // ふつうの等高線
+    case '7352': // 等高線に数値が入るところ
+    case '7353': // 等高線が崖に重なるところ
+    case '7371': // ふつうの等深線
+    case '7372': // 等深線に数値が入るところ
+    case '7373': // 等深線が崖に重なるところ
+    case '7401': // 湿地の地形表記面
+    case '7402': // 万年雪の地形表記面
+    case '7403': // 領域が明瞭な砂礫地の地形表記面
+    case '7501': // コンクリートな土崖
+    case '7502': // コンクリートでない土崖
+    case '7509': // 不明な土崖
+    case '7511': // 岩崖
+    case '7512': // 岩
+    case '7513': // 段丘崖
+    case '7521': // 雨裂の上部
+    case '7531': // 大凹地の方向線
+    case '7532': // 小凹地の方向線
+    case '7533': // <20>凹地の方向線
+    case '7541': // 隠顕岩
+    case '7551': // 干潟界
+    case '7561': // 枯れ川水涯線
+    case '7571': // 湖底急斜面
+    case '7572': // 水部の凹地の方向線
+    case '7601': // 領域が不明瞭な砂礫地の地形記号
+    case '7621': // 雨裂の下部
+      f.tippecanoe.layer = 'nature'
+      switch (f.properties._src) {
+        case '200000':
+          f.tippecanoe.maxzoon = 13
+          if (f.geometry.type === 'LineString') {
+            f.tippecanoe.minzoom = 11
+          }
+          break
+        case '25000':
+          f.tippecanoe.minzoom = 14
+          if (
+            f.properties.hasOwnProperty('alti') &&
+            f.properties.alti % 20 !== 0
+          ) {
+            f.tippecanoe.minzoom = 15
+          }
+          break
+        default:
+          throw new Error(`_src value ${f.properties._src} unknown.`)
+      }
+      break
+
+    // (2) water
     // 51: 海岸線, 52: 水涯線, 53: 河川中心線
     case '5100': // 海の水域
-    case '5101': // 海岸線の通常部
+    case '5101': // 海岸線
     case '5102': // 海岸線の岩等に接する部分
     case '5103': // 海岸線の堤防等に接する部分
     case '5111': // 海側の河口線
@@ -68,7 +119,7 @@ module.exports = (f) => {
     case '5188': // その他の海岸線
     case '5199': // 不明な海岸線
     case '5200': // 河川と湖池の水域
-    case '5201': // 河川の通常部
+    case '5201': // 河川
     case '5202': // 河川の岩等に接する部分
     case '5203': // 河川の堤防等に接する部分
     case '5211': // 河川側の河口線
@@ -94,110 +145,7 @@ module.exports = (f) => {
       f.tippecanoe.layer = 'water'
       break
 
-    // landform
-    case '5521': // 滝の水部構造物線
-    case '5801': // 滝の領域
-    case '7401': // 湿地の地形表記面
-    case '7402': // 万年雪の地形表記面
-    case '7403': // 領域が明瞭な砂礫地の地形表記面
-    case '7501': // コンクリートな土崖
-    case '7502': // コンクリートでない土崖
-    case '7509': // 不明な土崖
-    case '7511': // 岩崖
-    case '7512': // 岩
-    case '7513': // 段丘崖
-    case '7521': // 雨裂の上部
-    case '7531': // 大凹地の方向線
-    case '7532': // 小凹地の方向線
-    case '7533': // <20>凹地の方向線
-    case '7541': // 隠顕岩
-    case '7551': // 干潟界
-    case '7561': // 枯れ川水涯線
-    case '7571': // 湖底急斜面
-    case '7572': // 水部の凹地の方向線
-    case '7601': // 領域が不明瞭な砂礫地の地形記号
-    case '7621': // 雨裂の下部
-      f.tippecanoe.layer = 'landform'
-      switch (f.properties._src) {
-        case '200000':
-          f.tippecanoe.maxzoon = 13
-          if (f.geometry.type === 'LineString') {
-            f.tippecanoe.minzoom = 11
-          }
-          break
-        case '25000':
-          f.tippecanoe.minzoom = 14
-          break
-      }
-      break
-
-    // contour
-    case '7351': // ふつうの等高線
-    case '7352': // 等高線に数値が入るところ
-    case '7353': // 等高線が崖に重なるところ
-    case '7371': // ふつうの等深線
-    case '7372': // 等深線に数値が入るところ
-    case '7373': // 等深線が崖に重なるところ
-      f.tippecanoe.layer = 'contour'
-      switch (f.properties._src) {
-        case '200000':
-          f.tippecanoe.maxzoom = 13
-          break
-        case '25000':
-          f.tippecanoe.minzoom = 15
-          if (f.properties.alti % 20 === 0) {
-            f.tippecanoe.minzoom = 14
-          }
-          break
-      }
-      break
-
-    // building
-    case '3101': // 普通建物
-    case '3102': // 堅ろう建物
-    case '3103': // 高層建物
-    case '3111': // 普通無壁舎
-    case '3112': // 堅ろう無壁舎
-    case '3177': // <20>建築物
-    case '3188': // その他
-    case '3199': // 不明
-      f.tippecanoe.layer = 'building'
-      if (f.properties.ftCode === '3177') {
-        f.tippecanoe.minzoom = 12
-        f.tippecanoe.maxzoom = 14
-        let area = geojsonArea.geometry(f.geometry)
-        if (area < 1000) {
-          f.tippecanoe.minzoom = 15
-        } else if (area > 5000) {
-          f.tippecanoe.minzoom = 11
-        }
-      } else {
-        f.tippecanoe.minzoom = 15
-      }
-      break
-
-    // structure
-    case '4201': // 高塔の線
-    case '4202': // 坑口の線
-    case '4301': // 巨大構造物の面
-    case '4302': // タンクの面
-    case '5501': // ダムの線
-    case '5514': // せきの線
-    case '5515': // 水門の線
-    case '5532': // 透過水制の線
-    case '5551': // 河川トンネル口の線
-    case '8202': // 送電線
-    case '8206': // 大きな水制
-      f.tippecanoe.layer = 'structure'
-      break
-
-    // route
-    case '5901': // 船舶の表記線
-    case '5902': // 航路の表記線
-      f.tippecanoe.layer = 'route'
-      break
-
-    // boundary
+    // (3) boundary
     case '1103': // 郡と市と東京都の区の区画
     case '1104': // 町と村と指定都市の区の区画
     case '1201': // 都道府県の境界
@@ -240,7 +188,7 @@ module.exports = (f) => {
       }
       break
 
-    // road (道路縁)
+    // (4) road (道路縁)
     case '2200': // 階層化面閉じ線
     case '2201': // 通常の道路縁
     case '2202': // 通常の遮蔽された道路縁
@@ -269,7 +217,7 @@ module.exports = (f) => {
       f.tippecanoe.minzoom = 15 // 道路縁・道路構成線・道路区域界線は z=15 で採用
       break
 
-    // road (道路中心線)
+    // (4) road (道路中心線)
     case '2701': // ２条道路中心線
     case '2702': // 雪覆いがされた２条道路中心線
     case '2703': // 橋や高架の２条道路中心線
@@ -308,7 +256,7 @@ module.exports = (f) => {
       }
       break
 
-    // railway
+    // (5) railway
     case '2801': // 普通鉄道
     case '2802': // 遮蔽された普通鉄道
     case '2803': // 橋や高架の普通鉄道
@@ -362,7 +310,13 @@ module.exports = (f) => {
       }
       break
 
-    // transport
+    // (6) route
+    case '5901': // 船舶の表記線
+    case '5902': // 航路の表記線
+      f.tippecanoe.layer = 'route'
+      break
+
+    // (7) structure (formerly known as structure and transport)
     case '2901': // 国道番号(20/25共通)
     case '2902': // 踏切
     case '2903': // 都市高速道路番号(20/25共通)
@@ -376,10 +330,104 @@ module.exports = (f) => {
     case '2943': // <20>サービスエリア
     case '2944': // <20>パーキングエリア
     case '2945': // <20>スマートインターチェンジ
-      f.tippecanoe.layer = 'transport'
+    case '4201': // 高塔の線
+    case '4202': // 坑口の線
+    case '4301': // 巨大構造物の面
+    case '4302': // タンクの面
+    case '5501': // ダムの線
+    case '5514': // せきの線
+    case '5515': // 水門の線
+    case '5532': // 透過水制の線
+    case '5551': // 河川トンネル口の線
+    case '8202': // 送電線
+    case '8206': // 大きな水制
+      f.tippecanoe.layer = 'structure'
       break
 
-    // symbol
+    // (8) building
+    case '3101': // 普通建物
+    case '3102': // 堅ろう建物
+    case '3103': // 高層建物
+    case '3111': // 普通無壁舎
+    case '3112': // 堅ろう無壁舎
+    case '3177': // <20>建築物
+    case '3188': // その他
+    case '3199': // 不明
+      f.tippecanoe.layer = 'building'
+      if (f.properties.ftCode === '3177') {
+        f.tippecanoe.minzoom = 12
+        f.tippecanoe.maxzoom = 14
+        let area = geojsonArea.geometry(f.geometry)
+        if (area < 1000) {
+          f.tippecanoe.minzoom = 15
+        } else if (area > 5000) {
+          f.tippecanoe.minzoom = 11
+        }
+      } else {
+        f.tippecanoe.minzoom = 15
+      }
+      break
+
+    // (9) place (formarly known as label and symbol)
+    case '100': // <20>注記
+    case '200': // <20>注記（probably undocumented, but found）
+    case '300': // <20>注記（probably undocumented, but found）
+    case '0110': // 市区町村の行政区画
+    case '0120': // 飛び地の行政区画
+    case '0210': // 町字名の公称の居住地名
+    case '0220': // 集落名称の通称の居住地名
+    case '0311': // 山の総称
+    case '0312': // 山や岳や峰
+    case '0313': // 尖峰や丘や塚
+    case '0321': // 湖や沼や池や浦
+    case '0322': // 河川や用水
+    case '0323': // 沢や瀬や淵や瀞や谷や峡や雪渓や河原や州や滝や浜や崎や半島や尻や島
+    case '0331': // 高原や原や森や林や砂丘や湿原
+    case '0332': // 岩や溶岩や崖や鍾乳洞や温泉や湧水や噴泉や噴火口や峠や坂
+    case '0341': // 海や湾や灘や淵や浦や瀬や海峡や瀬戸
+    case '0342': // 海岸や浜や半島
+    case '0343': // 岬や鼻や崎や磯や敷
+    case '0351': // 群島や列島や島の総称
+    case '0352': // 島
+    case '0353': // はえや岩礁
+    case '0411': // 道路名
+    case '0412': // ICやPAや道の駅などの道路施設
+    case '0413': // 橋やトンネルなどの道路構造物
+    case '0421': // 鉄道路線名
+    case '0422': // 鉄道駅名
+    case '0423': // 橋やトンネルや操車場などの鉄道構造物
+    case '0431': // 港湾
+    case '0432': // フェリー発着所や埠頭などの港湾施設
+    case '0441': // 空港名（これだけ「名」と付いているのはなんでだろう）
+    case '0511': // 高塔や煙突などの構造物名称
+    case '0521': // ダム
+    case '0522': // 堰
+    case '0523': // 水門や堤防などの河川や海岸の施設
+    case '0531': // 演習場やゴルフ場や遊園地や建設予定地などの土地利用名
+    case '0532': // 史跡や名勝や天然記念物
+    case '0533': // 漁港
+    case '0534': // 公園
+    case '0611': // 合同庁舎
+    case '0612': // 合同庁舎や矯正施設や自衛隊を除く国の機関
+    case '0613': // 刑務所や少年院などの矯正施設
+    case '0615': // 自衛隊と米軍
+    case '0621': // 県庁
+    case '0631': // 大学と大学院
+    case '0632': // 短期大学
+    case '0633': // 高等専門学校
+    case '0634': // 特殊学校
+    case '0651': // 水族館や動植物園
+    case '0653': // 発電所
+    case '0654': // 料金所
+    case '0661': // 神社
+    case '0662': // 寺院
+    case '0671': // 商業施設
+    case '0672': // 高層施設
+    case '0673': // 文教施設
+    case '0681': // その他の主要または著名な建物
+    case '0710': // ふりがな
+    case '0720': // 鉱山の鉱種名
+    case '0999': // その他の注記
     case '3200': // 指示点
     case '3201': // 官公署
     case '3202': // 裁判所
@@ -458,70 +506,7 @@ module.exports = (f) => {
     case '8103': // 発電所等
     case '8105': // 電波塔
     case '8301': // 樹木に囲まれた居住地
-      f.tippecanoe.layer = 'symbol'
-      break
-
-    // label 
-    case '100': // <20>注記
-    case '200': // <20>注記（probably undocumented, but found）
-    case '300': // <20>注記（probably undocumented, but found）
-    case '0110': // 市区町村の行政区画
-    case '0120': // 飛び地の行政区画
-    case '0210': // 町字名の公称の居住地名
-    case '0220': // 集落名称の通称の居住地名
-    case '0311': // 山の総称
-    case '0312': // 山や岳や峰
-    case '0313': // 尖峰や丘や塚
-    case '0321': // 湖や沼や池や浦
-    case '0322': // 河川や用水
-    case '0323': // 沢や瀬や淵や瀞や谷や峡や雪渓や河原や州や滝や浜や崎や半島や尻や島
-    case '0331': // 高原や原や森や林や砂丘や湿原
-    case '0332': // 岩や溶岩や崖や鍾乳洞や温泉や湧水や噴泉や噴火口や峠や坂
-    case '0341': // 海や湾や灘や淵や浦や瀬や海峡や瀬戸
-    case '0342': // 海岸や浜や半島
-    case '0343': // 岬や鼻や崎や磯や敷
-    case '0351': // 群島や列島や島の総称
-    case '0352': // 島
-    case '0353': // はえや岩礁
-    case '0411': // 道路名
-    case '0412': // ICやPAや道の駅などの道路施設
-    case '0413': // 橋やトンネルなどの道路構造物
-    case '0421': // 鉄道路線名
-    case '0422': // 鉄道駅名
-    case '0423': // 橋やトンネルや操車場などの鉄道構造物
-    case '0431': // 港湾
-    case '0432': // フェリー発着所や埠頭などの港湾施設
-    case '0441': // 空港名（これだけ「名」と付いているのはなんでだろう）
-    case '0511': // 高塔や煙突などの構造物名称
-    case '0521': // ダム
-    case '0522': // 堰
-    case '0523': // 水門や堤防などの河川や海岸の施設
-    case '0531': // 演習場やゴルフ場や遊園地や建設予定地などの土地利用名
-    case '0532': // 史跡や名勝や天然記念物
-    case '0533': // 漁港
-    case '0534': // 公園
-    case '0611': // 合同庁舎
-    case '0612': // 合同庁舎や矯正施設や自衛隊を除く国の機関
-    case '0613': // 刑務所や少年院などの矯正施設
-    case '0615': // 自衛隊と米軍
-    case '0621': // 県庁
-    case '0631': // 大学と大学院
-    case '0632': // 短期大学
-    case '0633': // 高等専門学校
-    case '0634': // 特殊学校
-    case '0651': // 水族館や動植物園
-    case '0653': // 発電所
-    case '0654': // 料金所
-    case '0661': // 神社
-    case '0662': // 寺院
-    case '0671': // 商業施設
-    case '0672': // 高層施設
-    case '0673': // 文教施設
-    case '0681': // その他の主要または著名な建物
-    case '0710': // ふりがな
-    case '0720': // 鉱山の鉱種名
-    case '0999': // その他の注記
-      f.tippecanoe.layer = 'label'
+      f.tippecanoe.layer = 'place'
       break
 
     case '9201': // 仮想線
