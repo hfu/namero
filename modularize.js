@@ -67,6 +67,10 @@ const modularize = (path, src, cb) => {
   input.on('end', () => {
     return cb()
   })
+
+  input.on('err', err => {
+    console.log(err.stack)
+  })
 }
 
 const closeAll = () => {
@@ -79,6 +83,7 @@ const closeAll = () => {
 }
 
 const queue = new Queue((t, cb) => {
+console.log(t.path)
   modularize(t.path, t.src, cb)
 })
 
@@ -91,10 +96,13 @@ queue.on('task_finish', () => {
   if (nTasks === 0) closeAll()
 })
 
-for (const src of ['200000', '25000']) {
+for (const src of config.get('src')) {
   walk.walk(src).on('file', (root, stat, next) => {
     if (stat.name.endsWith('ndjson.gz')) {
-      queue.push({ src: src, path: `${root}/${stat.name}` })
+      queue.push({
+        src: stat.name.split('.')[0],
+        path: `${root}/${stat.name}`
+      })
     }
     next()
  })

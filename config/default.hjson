@@ -1,4 +1,7 @@
 {
+  src: [
+    concatinated
+  ]
   dst: dst
   z: 10
   minAge: 60000
