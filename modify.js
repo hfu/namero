@@ -89,9 +89,9 @@ module.exports = (f) => {
       f.tippecanoe.layer = 'nature'
       switch (f.properties._src) {
         case '200000':
-          f.tippecanoe.maxzoon = 13
+          f.tippecanoe.maxzoom = 13
           if (f.geometry.type === 'LineString') {
-            f.tippecanoe.minzoom = 11
+            f.tippecanoe.minzoom = 10
           }
           break
         case '25000':
@@ -506,6 +506,14 @@ module.exports = (f) => {
     case '8103': // 発電所等
     case '8105': // 電波塔
     case '8301': // 樹木に囲まれた居住地
+      switch (f.properties._src) {
+        case '200000':
+          f.tippecanoe.maxzoom = 14
+          break
+        case '25000':
+          f.tippecanoe.minzoom = 15
+          break
+      }
       f.tippecanoe.layer = 'place'
       break
 
