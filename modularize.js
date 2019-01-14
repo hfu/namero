@@ -93,7 +93,11 @@ queue.on('task_queued', () => {
 
 queue.on('task_finish', () => {
   nTasks--
-  if (nTasks === 0) closeAll()
+  if (nTasks === 0) {
+    setTimeout(() => {
+      closeAll()
+    }, 3000)
+  }
 })
 
 for (const src of config.get('src')) {
