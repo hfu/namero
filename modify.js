@@ -509,6 +509,16 @@ module.exports = (f) => {
       switch (f.properties._src) {
         case '200000':
           f.tippecanoe.maxzoom = 14
+          switch (f.properties.ftCode) {
+            case '100':
+            case '200':
+            case '300':
+              f.tippecanoe.minzoom = 10
+              break
+            default:
+              f.tippecanoe.minzoom = 12
+              break
+          }
           break
         case '25000':
           f.tippecanoe.minzoom = 15
