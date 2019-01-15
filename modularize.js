@@ -83,7 +83,6 @@ const closeAll = () => {
 }
 
 const queue = new Queue((t, cb) => {
-console.log(t.path)
   modularize(t.path, t.src, cb)
 })
 
@@ -93,7 +92,13 @@ queue.on('task_queued', () => {
 
 queue.on('task_finish', () => {
   nTasks--
-  if (nTasks === 0) closeAll()
+  if (nTasks === 0) {
+    console.log('All files will be closed within 30 seconds.')
+    setTimeout(() => {
+      closeAll()
+      console.log('All files closed.')
+    }, 30000)
+  }
 })
 
 for (const src of config.get('src')) {
