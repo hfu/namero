@@ -508,6 +508,11 @@ module.exports = (f) => {
     case '8301': // 樹木に囲まれた居住地
       switch (f.properties._src) {
         case '200000':
+          if (parseInt(f.properties.ftCode) < 1000) {
+            f.tippecanoe.minzoom= 12
+          } else {
+            f.tippecanoe.minzoom = 10 //
+          }
           f.tippecanoe.maxzoom = 14
           break
         case '25000':
